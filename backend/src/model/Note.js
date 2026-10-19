@@ -12,7 +12,7 @@ const noteSchema = new mongoose.Schema(
             required:true
         }
     },
-    {timestamp: true} //Mongo will automatically add the created date and the modified dates
+    {timestamps: true} //Mongo will automatically add the created date and the modified dates
 )
 
 //then we create a model made from the schema above (noteSchema)
