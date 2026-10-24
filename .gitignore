@@ -23,8 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-#frontend node_modules
+node_modules/
+**/node_modules/
+.env
+.env.*
+!.env.example
+dist/
 node_modules/
 
 
-.env
