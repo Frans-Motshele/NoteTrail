@@ -51,6 +51,8 @@ A full-stack note-taking app built with the MERN stack. Create, view, edit, and 
 ```
 NoteTrail/
 ├── backend/
+│   ├── Dockerfile
+│   ├── .dockerignore
 │   └── src/
 │       ├── config/          # MongoDB (db.js) and Upstash (upstash.js) setup
 │       ├── controller/      # Notes request handlers
@@ -59,12 +61,16 @@ NoteTrail/
 │       ├── routes/          # /api/notes routes
 │       └── server.js        # Express entry point
 ├── frontend/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── nginx.conf           # Serves the React build, proxies /api to the backend
 │   └── src/
 │       ├── components/      # Navbar, NoteCard, NotesNotFound, RateLimitedUI
 │       ├── Pages/           # HomePage, CreatePage, NoteDetailPage
 │       ├── lib/             # Axios instance and helpers
 │       ├── App.jsx
 │       └── main.jsx
+├── docker-compose.yml       # Runs backend and frontend together
 └── package.json             # Root build/start scripts
 ```
 
@@ -73,6 +79,7 @@ NoteTrail/
 - [Node.js](https://nodejs.org/) v18 or later
 - A [MongoDB](https://www.mongodb.com/) database (local or Atlas)
 - A free [Upstash Redis](https://upstash.com/) database for rate limiting
+- [Docker](https://www.docker.com/) and Docker Compose (optional, only for the Docker setup)
 
 ## Getting Started
 
@@ -136,6 +143,30 @@ npm start       # starts the backend, which serves frontend/dist
 
 Make sure `NODE_ENV=production` is set in your hosting environment. The Express server then serves the React build and handles API requests from the same domain.
 
+### 5. Run with Docker
+ 
+The repo includes a Dockerfile for each service and a `docker-compose.yml` that runs both.
+ 
+- **Backend:** Node 22 (Alpine) running the Express API on port `5001`, reachable only inside the Docker network.
+- **Frontend:** a multi-stage build that compiles the React app, then serves it with Nginx on port `80`. Nginx forwards `/api/` requests to the backend and falls back to `index.html` for client-side routes.
+  
+1. Create `backend/.env` as described in [step 2](#2-configure-environment-variables). The `.env` file is excluded from the image by `.dockerignore` and loaded at runtime through `env_file`.
+2. From the project root, build and start both containers:
+   
+```bash
+docker compose up --build
+```
+ 
+3. Open http://localhost.
+   
+Useful commands:
+ 
+```bash
+docker compose up -d --build   # run in the background
+docker compose logs -f         # follow logs
+docker compose down            # stop and remove containers
+```
+ 
 ## API Reference
 
 Base URL: `/api/notes`
