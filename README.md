@@ -166,7 +166,57 @@ docker compose up -d --build   # run in the background
 docker compose logs -f         # follow logs
 docker compose down            # stop and remove containers
 ```
+## Docker Deployment
  
+Prebuilt images for NoteTrail are published on Docker Hub, so you can run the app without cloning the repo or building anything locally.
+ 
+| Service | Image |
+| --- | --- |
+| Backend (Express API) | fransmotshele/notetrail-backend:latest |
+| Frontend (React + Nginx) | fransmotshele/notetrail-frontend:latest |
+ 
+ 
+### 1. Create the environment file
+ 
+Create a folder for the deployment and add a `.env` file in it:
+ 
+```env
+Port=5001
+Mongo_url=your_mongodb_connection_string
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
+```
+ 
+### 2. Pull docker-compose.prod.yml file
+
+ Automatically pulls the frontend and backend images from Docker Hub images from docker hub, creates the containers from those images, starts the containers in the background and connects the frontend and backend through the Compose network.
+
+> The backend service must be named `backend`. The frontend's Nginx config proxies `/api/` requests to `http://backend:5001`.
+ 
+### 3. Start the application
+ 
+```bash
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+```
+ 
+Then open http://localhost in your browser. Compose pulls any image that isn't already available locally.
+ 
+### Managing the deployment
+ 
+```bash
+docker compose ps              # check container status
+docker compose logs -f         # follow logs
+docker compose pull            # fetch newer images
+docker compose up -d           # recreate containers with the new images
+docker compose down            # stop and remove containers
+```
+ 
+### Notes
+ 
+- MongoDB and Upstash Redis are external services, so no database container is needed. Make sure your MongoDB instance accepts connections from the machine running Docker (for Atlas, add its IP to the network access list).
+- To serve on a different host port, change `"80:80"` to something like `"8080:80"` and open http://localhost:8080.
+- Never bake your `.env` into an image or commit it to Git. Pass it in at runtime as shown above.
 ## API Reference
 
 Base URL: `/api/notes`
