@@ -1,0 +1,22 @@
+#builds images from  Docker Hub, you need to have your very own env under correct path(/backend). 
+#Look under the '.env.example' file for example of the required env
+
+services:
+  backend:
+    image: fransmotshele/notetrail-backend:1.0.0
+    env_file:
+      - ./Backend/.env
+    environment:
+      PORT: 5001
+      NODE_ENV: production
+    expose:
+      - "5001"
+    restart: unless-stopped
+
+  frontend:
+    image: fransmotshele/notetrail-frontend:1.0.0
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

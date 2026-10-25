@@ -1,4 +1,4 @@
-
+#builds images from source code whereas docker-compose.prod.yml builds from images pushed to Docker Hub
 services:
   backend:
     build:
